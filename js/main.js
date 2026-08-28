@@ -150,6 +150,22 @@
     });
   }
 
+  /* ---------- Portfolio Video Previews ---------- */
+  function initVideoPreviews() {
+    const previews = document.querySelectorAll("video[data-preview-duration]");
+
+    previews.forEach(function (video) {
+      const duration = parseFloat(video.getAttribute("data-preview-duration"));
+      if (!Number.isFinite(duration) || duration <= 0) return;
+
+      video.addEventListener("timeupdate", function () {
+        if (video.currentTime < duration) return;
+        video.currentTime = 0;
+        video.play().catch(function () {});
+      });
+    });
+  }
+
   /* ---------- Animated Counters ---------- */
   function initCounters() {
     const counters = document.querySelectorAll("[data-count]");
@@ -220,10 +236,34 @@
 
     // Detect local file vs remote URL
     if (videoUrl.match(/^https?:\/\//)) {
+      let embedUrl = videoUrl;
+      let youtubeUrl = videoUrl;
+
+      try {
+        const parsedUrl = new URL(videoUrl);
+        const videoId = parsedUrl.hostname === "youtu.be"
+          ? parsedUrl.pathname.slice(1)
+          : parsedUrl.searchParams.get("v");
+
+        if (videoId) {
+          youtubeUrl = "https://www.youtube.com/watch?v=" + videoId;
+          embedUrl = "https://www.youtube.com/embed/" + videoId;
+        }
+      } catch (error) {
+        // Keep the original URL when it cannot be parsed.
+      }
+
+      // YouTube requires an HTTP referrer for iframe playback (Error 153).
+      if (window.location.protocol === "file:") {
+        window.open(youtubeUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+
       // Remote (YouTube) ΓÇö use iframe
       const iframe = document.createElement("iframe");
-      iframe.src = videoUrl + "?autoplay=1&rel=0";
-      iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+      iframe.src = embedUrl + "?autoplay=1&rel=0";
+      iframe.allow = "autoplay; encrypted-media; picture-in-picture; web-share";
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
       iframe.allowFullscreen = true;
       iframe.title = "Project video";
       lightboxVideo.appendChild(iframe);
@@ -435,6 +475,7 @@
     initMobileNav();
     initMagneticButtons();
     initScrollReveal();
+    initVideoPreviews();
     initCounters();
     initLightbox();
   }
