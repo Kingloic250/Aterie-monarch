@@ -1,5 +1,5 @@
 /* ============================================
-   ATERIEL MONARCH — main.js
+    ATERIEL MONARCH ΓÇö main.js
    All interactive behaviors in vanilla JS
    ============================================ */
 
@@ -220,7 +220,7 @@
 
     // Detect local file vs remote URL
     if (videoUrl.match(/^https?:\/\//)) {
-      // Remote (YouTube) — use iframe
+      // Remote (YouTube) ΓÇö use iframe
       const iframe = document.createElement("iframe");
       iframe.src = videoUrl + "?autoplay=1&rel=0";
       iframe.allow = "autoplay; encrypted-media; picture-in-picture";
@@ -228,7 +228,7 @@
       iframe.title = "Project video";
       lightboxVideo.appendChild(iframe);
     } else {
-      // Local file — use video element
+      // Local file ΓÇö use video element
       const video = document.createElement("video");
       video.src = videoUrl;
       video.controls = true;
